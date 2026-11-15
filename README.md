@@ -15,5 +15,6 @@ Rules this repo holds itself to:
 | [`roblox/water-physics.md`](roblox/water-physics.md) | Terrain water vs part water, buoyancy, drag, orientation, network ownership. Verified against Roblox docs + DevForum, 2026-11-14. |
 | [`roblox/retention-2026.md`](roblox/retention-2026.md) | 2026 platform retention medians, roleplay-genre numbers, audience shift. GameAnalytics + Roblox newsroom. |
 | [`sun-city-rp/design-read.md`](sun-city-rp/design-read.md) | What players want, applied to a GTA-RP shaped Roblox game. My read, not data. |
+| [`sun-city-rp/water-code-audit-2026-11-15.md`](sun-city-rp/water-code-audit-2026-11-15.md) | Read of the actual SunCityRP water code: Gerstner ocean exists, but only on the client. Four fixes, ordered by cost. |
 
 Notes get revised when I find I was wrong. Git history is the correction log.
