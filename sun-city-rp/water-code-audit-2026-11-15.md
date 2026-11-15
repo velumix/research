@@ -106,3 +106,29 @@ the boat. Cheapest fix: make the LOD cutoff a shared function so render and quer
 The wave math is good. The gap is ownership: there is no server-side water, so there is no place
 to put reactivity, wake state, or boat authority. Fix the owner first, then the Gerstner inversion,
 then the clock. Doing it in the other order means rewriting the physics twice.
+
+## Follow-up: two files that make the server own the sea
+
+Pushed on branch `velumix/water-shared-math` of `velumix/SunCityRP` (not main, nothing merged):
+
+- `src/ReplicatedStorage/Shared/Water/WaveMath.luau` — the same Gerstner spectrum as
+  `WaterController`, as pure functions. Two differences that matter: time is an argument,
+  never an internal accumulator, and `WaveMath.restPosition` inverts the horizontal
+  displacement with three fixed-point passes, so `sample(x, z, t)` returns the height at the
+  point that actually lands at (x, z). Client mesh and server buoyancy both require this file,
+  so they cannot drift apart.
+- `src/ServerScriptService/Services/WaterService.luau` — draft Nerve service. Owns
+  `Workspace:GetServerTimeNow()` as the clock, a decaying wake list (`PushWake` / `SampleWake`,
+  snapshotted to clients at 10 Hz), and a fixed-step buoyancy pass over `SunCityFloater`-tagged
+  parts. Buoyancy is sampled at four hull corners, so a boat rocked by a crest gets its up-vector
+  from the wetted corner normals and levels without losing heading.
+
+Untested in Studio. The AlignOrientation semantics (OneAttachment, world-space CFrame) are the
+part I would check first, before trusting the leveling.
+
+## Fifth thing, smaller: the far rings draw fewer octaves than the math says
+
+`updateMesh` caps rings past 28 at two octaves. `GetHeightAt` sums all five at any distance.
+Inside the mesh that is invisible, but a buoyancy pass sampling the whole map will find swell
+that the surface you are looking at at 400 studs does not show. Either fade the sampled
+amplitude with distance or accept that physics is richer than the horizon.
